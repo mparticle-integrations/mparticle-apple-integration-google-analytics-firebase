@@ -7,14 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2201B9BC04165A61BACF69AE /* libPods-mParticle-Firebase-AnalyticsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FE7E97DC45688F4667782CD0 /* libPods-mParticle-Firebase-AnalyticsTests.a */; };
 		D316BD43217F670600688E56 /* mParticle-Firebase-Analytics.h in Headers */ = {isa = PBXBuildFile; fileRef = D316BD35217F670500688E56 /* mParticle-Firebase-Analytics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D316BD4E217F67BC00688E56 /* MPKitFirebaseAnalytics.h in Headers */ = {isa = PBXBuildFile; fileRef = D316BD4C217F67BC00688E56 /* MPKitFirebaseAnalytics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D316BD4F217F67BC00688E56 /* MPKitFirebaseAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = D316BD4D217F67BC00688E56 /* MPKitFirebaseAnalytics.m */; };
+		D3C7855521FF6CEC00FE47D2 /* mParticle_Firebase_AnalyticsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D3C7855421FF6CEC00FE47D2 /* mParticle_Firebase_AnalyticsTests.m */; };
+		D3C7855721FF6CEC00FE47D2 /* mParticle_Firebase_Analytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D316BD32217F670500688E56 /* mParticle_Firebase_Analytics.framework */; };
 		DAC5754C339774D8CFFDE7D8 /* libPods-mParticle-Firebase-Analytics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E59F7B5025B2DE7EABACF5CE /* libPods-mParticle-Firebase-Analytics.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		D3C7855821FF6CEC00FE47D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D316BD29217F670500688E56 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D316BD31217F670500688E56;
+			remoteInfo = "mParticle-Firebase-Analytics";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		619F501A03C247A2E37DEE7F /* Pods-mParticle-Firebase-AnalyticsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mParticle-Firebase-AnalyticsTests.debug.xcconfig"; path = "Target Support Files/Pods-mParticle-Firebase-AnalyticsTests/Pods-mParticle-Firebase-AnalyticsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9B4577DFDEF24FE84AAC1F94 /* Pods-mParticle-Firebase-Analytics.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mParticle-Firebase-Analytics.debug.xcconfig"; path = "Target Support Files/Pods-mParticle-Firebase-Analytics/Pods-mParticle-Firebase-Analytics.debug.xcconfig"; sourceTree = "<group>"; };
+		C36975864B0BB8F3A6A952E3 /* Pods-mParticle-Firebase-AnalyticsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mParticle-Firebase-AnalyticsTests.release.xcconfig"; path = "Target Support Files/Pods-mParticle-Firebase-AnalyticsTests/Pods-mParticle-Firebase-AnalyticsTests.release.xcconfig"; sourceTree = "<group>"; };
 		C7B8FAD18792236712DCE464 /* Pods-mParticle-Firebase-Analytics.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mParticle-Firebase-Analytics.release.xcconfig"; path = "Target Support Files/Pods-mParticle-Firebase-Analytics/Pods-mParticle-Firebase-Analytics.release.xcconfig"; sourceTree = "<group>"; };
 		D3085197219B605900D1C15A /* OCMock.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OCMock.framework; path = Carthage/Build/iOS/OCMock.framework; sourceTree = "<group>"; };
 		D316BD32217F670500688E56 /* mParticle_Firebase_Analytics.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = mParticle_Firebase_Analytics.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -30,7 +45,11 @@
 		D316BD57217F6D8B00688E56 /* OptimizelySDKEventDispatcher.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OptimizelySDKEventDispatcher.framework; path = Carthage/Build/iOS/OptimizelySDKEventDispatcher.framework; sourceTree = "<group>"; };
 		D316BD5E217F6DAA00688E56 /* mParticle_Apple_SDK.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = mParticle_Apple_SDK.framework.dSYM; path = Carthage/Build/iOS/mParticle_Apple_SDK.framework.dSYM; sourceTree = "<group>"; };
 		D316BD60217F6DC800688E56 /* mParticle_Apple_SDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mParticle_Apple_SDK.framework; path = Carthage/Build/iOS/mParticle_Apple_SDK.framework; sourceTree = "<group>"; };
+		D3C7855221FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mParticle-Firebase-AnalyticsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3C7855421FF6CEC00FE47D2 /* mParticle_Firebase_AnalyticsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = mParticle_Firebase_AnalyticsTests.m; sourceTree = "<group>"; };
+		D3C7855621FF6CEC00FE47D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E59F7B5025B2DE7EABACF5CE /* libPods-mParticle-Firebase-Analytics.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mParticle-Firebase-Analytics.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE7E97DC45688F4667782CD0 /* libPods-mParticle-Firebase-AnalyticsTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mParticle-Firebase-AnalyticsTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +61,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D3C7854F21FF6CEB00FE47D2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3C7855721FF6CEC00FE47D2 /* mParticle_Firebase_Analytics.framework in Frameworks */,
+				2201B9BC04165A61BACF69AE /* libPods-mParticle-Firebase-AnalyticsTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -50,6 +78,8 @@
 			children = (
 				9B4577DFDEF24FE84AAC1F94 /* Pods-mParticle-Firebase-Analytics.debug.xcconfig */,
 				C7B8FAD18792236712DCE464 /* Pods-mParticle-Firebase-Analytics.release.xcconfig */,
+				619F501A03C247A2E37DEE7F /* Pods-mParticle-Firebase-AnalyticsTests.debug.xcconfig */,
+				C36975864B0BB8F3A6A952E3 /* Pods-mParticle-Firebase-AnalyticsTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -58,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				D316BD34217F670500688E56 /* mParticle-Firebase-Analytics */,
+				D3C7855321FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests */,
 				D316BD33217F670500688E56 /* Products */,
 				D316BD51217F6D8A00688E56 /* Frameworks */,
 				8900B9495CB76E34AFC3C04A /* Pods */,
@@ -68,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				D316BD32217F670500688E56 /* mParticle_Firebase_Analytics.framework */,
+				D3C7855221FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,8 +128,18 @@
 				D316BD54217F6D8B00688E56 /* OptimizelySDKShared.framework */,
 				D316BD55217F6D8B00688E56 /* OptimizelySDKUserProfileService.framework */,
 				E59F7B5025B2DE7EABACF5CE /* libPods-mParticle-Firebase-Analytics.a */,
+				FE7E97DC45688F4667782CD0 /* libPods-mParticle-Firebase-AnalyticsTests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D3C7855321FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests */ = {
+			isa = PBXGroup;
+			children = (
+				D3C7855421FF6CEC00FE47D2 /* mParticle_Firebase_AnalyticsTests.m */,
+				D3C7855621FF6CEC00FE47D2 /* Info.plist */,
+			);
+			path = "mParticle-Firebase-AnalyticsTests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -134,6 +176,25 @@
 			productReference = D316BD32217F670500688E56 /* mParticle_Firebase_Analytics.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		D3C7855121FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3C7855C21FF6CEC00FE47D2 /* Build configuration list for PBXNativeTarget "mParticle-Firebase-AnalyticsTests" */;
+			buildPhases = (
+				2338CCEAE4912AF68986FA33 /* [CP] Check Pods Manifest.lock */,
+				D3C7854E21FF6CEB00FE47D2 /* Sources */,
+				D3C7854F21FF6CEB00FE47D2 /* Frameworks */,
+				D3C7855021FF6CEB00FE47D2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D3C7855921FF6CEC00FE47D2 /* PBXTargetDependency */,
+			);
+			name = "mParticle-Firebase-AnalyticsTests";
+			productName = "mParticle-Firebase-AnalyticsTests";
+			productReference = D3C7855221FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -145,6 +206,9 @@
 				TargetAttributes = {
 					D316BD31217F670500688E56 = {
 						CreatedOnToolsVersion = 9.4;
+					};
+					D3C7855121FF6CEB00FE47D2 = {
+						CreatedOnToolsVersion = 10.1;
 					};
 				};
 			};
@@ -161,12 +225,20 @@
 			projectRoot = "";
 			targets = (
 				D316BD31217F670500688E56 /* mParticle-Firebase-Analytics */,
+				D3C7855121FF6CEB00FE47D2 /* mParticle-Firebase-AnalyticsTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		D316BD30217F670500688E56 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3C7855021FF6CEB00FE47D2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -198,6 +270,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		2338CCEAE4912AF68986FA33 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-mParticle-Firebase-AnalyticsTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -209,7 +303,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D3C7854E21FF6CEB00FE47D2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3C7855521FF6CEC00FE47D2 /* mParticle_Firebase_AnalyticsTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D3C7855921FF6CEC00FE47D2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D316BD31217F670500688E56 /* mParticle-Firebase-Analytics */;
+			targetProxy = D3C7855821FF6CEC00FE47D2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D316BD44217F670600688E56 /* Debug */ = {
@@ -382,6 +492,45 @@
 			};
 			name = Release;
 		};
+		D3C7855A21FF6CEC00FE47D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 619F501A03C247A2E37DEE7F /* Pods-mParticle-Firebase-AnalyticsTests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "mParticle-Firebase-AnalyticsTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Firebase-AnalyticsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D3C7855B21FF6CEC00FE47D2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C36975864B0BB8F3A6A952E3 /* Pods-mParticle-Firebase-AnalyticsTests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "mParticle-Firebase-AnalyticsTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mparticle.mParticle-Firebase-AnalyticsTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -399,6 +548,15 @@
 			buildConfigurations = (
 				D316BD47217F670600688E56 /* Debug */,
 				D316BD48217F670600688E56 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3C7855C21FF6CEC00FE47D2 /* Build configuration list for PBXNativeTarget "mParticle-Firebase-AnalyticsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3C7855A21FF6CEC00FE47D2 /* Debug */,
+				D3C7855B21FF6CEC00FE47D2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

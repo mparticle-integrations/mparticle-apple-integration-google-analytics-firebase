@@ -17,7 +17,7 @@
 //
 
 #import "MPKitFirebaseAnalytics.h"
-@import Firebase;
+#import "Firebase.h";
 
 @implementation MPKitFirebaseAnalytics
 
@@ -44,7 +44,11 @@
         static dispatch_once_t FirebasePredicate;
         
         dispatch_once(&FirebasePredicate, ^{
-            FIROptions *options = [[FIROptions alloc] init];
+            NSString *googleAppId = configuration[googleAppIDKey];
+            NSString *gcmSenderId = configuration[senderID];
+            
+            FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:googleAppId GCMSenderID:gcmSenderId];
+            
             [FIRApp configureWithOptions:options];
             
             self->_started = YES;
@@ -76,7 +80,7 @@
             for (MPProduct *product in commerceEvent.products) {
                 [FIRAnalytics logEventWithName:kFIREventAddToCart
                                     parameters:@{
-                                                 kFIRParameterQuantity: @1,
+                                                 kFIRParameterQuantity: product.quantity,
                                                  kFIRParameterItemID: product.sku,
                                                  kFIRParameterItemName: product.name,
                                                  kFIRParameterItemCategory: product.category,
@@ -92,7 +96,7 @@
             for (MPProduct *product in commerceEvent.products) {
                 [FIRAnalytics logEventWithName:kFIREventRemoveFromCart
                                     parameters:@{
-                                                 kFIRParameterQuantity: @1,
+                                                 kFIRParameterQuantity: product.quantity,
                                                  kFIRParameterItemID: product.sku,
                                                  kFIRParameterItemName: product.name,
                                                  kFIRParameterItemCategory: product.category,
@@ -108,7 +112,7 @@
             for (MPProduct *product in commerceEvent.products) {
                 [FIRAnalytics logEventWithName:kFIREventAddToWishlist
                                     parameters:@{
-                                                 kFIRParameterQuantity: @1,
+                                                 kFIRParameterQuantity: product.quantity,
                                                  kFIRParameterItemID: product.sku,
                                                  kFIRParameterItemName: product.name,
                                                  kFIRParameterItemCategory: product.category,
@@ -168,9 +172,9 @@
                                     parameters:@{
                                                  kFIRParameterItemID: product.sku,
                                                  kFIRParameterItemName: product.name,
-                                                 kFIRParameterItemCategory: commerceEvent.products[0].category,
+                                                 kFIRParameterItemCategory: product.category,
                                                  kFIRParameterPrice: product.price,
-                                                 kFIRParameterQuantity: @1,
+                                                 kFIRParameterQuantity: product.quantity,
                                                  kFIRParameterCurrency: commerceEvent.currency,
                                                  kFIRParameterValue: product.price
                                                  }];

@@ -23,6 +23,9 @@
 #import "mParticle.h"
 #endif
 
+static NSString *const googleAppIDKey = @"googleId";
+static NSString *const senderID = @"gcmsenderId";
+
 @interface MPKitFirebaseAnalytics : NSObject <MPKitProtocol>
 
 @property (nonatomic, strong, nonnull) NSDictionary *configuration;
