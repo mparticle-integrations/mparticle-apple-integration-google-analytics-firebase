@@ -6,7 +6,7 @@ target 'mParticle-Firebase-Analytics' do
   # use_frameworks!
 
   # Pods for mParticle-Firebase-Analytics
-pod 'Firebase/Core', '~> 5.15'
+pod 'Firebase/Core', '~> 5.16'
 pod 'mParticle-Apple-SDK/mParticle', '~> 7.8.3'
 
 end
@@ -15,8 +15,9 @@ target 'mParticle-Firebase-AnalyticsTests' do
   # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!
 
-  # Pods for mParticle-Firebase-Analytics
-pod 'Firebase/Core', '~> 5.15'
+  # Pods for mParticle-Firebase-AnalyticsTests
+pod 'Firebase/Core', '~> 5.16'
 pod 'mParticle-Apple-SDK/mParticle', '~> 7.8.3'
+pod 'OCMock'
 
 end

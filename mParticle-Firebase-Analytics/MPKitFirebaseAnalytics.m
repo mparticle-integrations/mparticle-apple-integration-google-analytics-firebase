@@ -17,7 +17,13 @@
 //
 
 #import "MPKitFirebaseAnalytics.h"
-#import "Firebase.h";
+#import "Firebase.h"
+
+@interface MPKitFirebaseAnalytics()
+
+@property (nonatomic, strong, readwrite) FIROptions *firebaseOptions;
+
+@end
 
 @implementation MPKitFirebaseAnalytics
 
@@ -31,6 +37,7 @@
     MPKitRegister *kitRegister = [[MPKitRegister alloc] initWithName:@"FirebaseAnalytics" className:@"MPKitFirebaseAnalytics"];
     [MParticle registerExtension:kitRegister];
 }
+
 
 - (MPKitExecStatus *)execStatus:(MPKitReturnCode)returnCode {
     return [[MPKitExecStatus alloc] initWithSDKCode:self.class.kitCode returnCode:returnCode];
@@ -49,6 +56,7 @@
             
             FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:googleAppId GCMSenderID:gcmSenderId];
             
+            self.firebaseOptions = options;
             [FIRApp configureWithOptions:options];
             
             self->_started = YES;
@@ -73,53 +81,43 @@
 }
 
 - (MPKitExecStatus *)logCommerceEvent:(MPCommerceEvent *)commerceEvent {
-    MPKitExecStatus *execStatus = [self execStatus:MPKitReturnCodeSuccess];
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
+    NSDictionary<NSString *, id> *parameters = [[NSMutableDictionary alloc] init];
     
     switch (commerceEvent.action) {
         case MPCommerceEventActionAddToCart: {
             for (MPProduct *product in commerceEvent.products) {
+                parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:product withValue:nil];
+                
                 [FIRAnalytics logEventWithName:kFIREventAddToCart
-                                    parameters:@{
-                                                 kFIRParameterQuantity: product.quantity,
-                                                 kFIRParameterItemID: product.sku,
-                                                 kFIRParameterItemName: product.name,
-                                                 kFIRParameterItemCategory: product.category,
-                                                 kFIRParameterValue: product.price,
-                                                 kFIRParameterPrice: product.price,
-                                                 kFIRParameterCurrency: commerceEvent.currency
-                                                 }];
+                                    parameters:parameters];
             }
         }
             break;
             
         case MPCommerceEventActionRemoveFromCart: {
             for (MPProduct *product in commerceEvent.products) {
+                parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:product withValue:nil];
+                
                 [FIRAnalytics logEventWithName:kFIREventRemoveFromCart
-                                    parameters:@{
-                                                 kFIRParameterQuantity: product.quantity,
-                                                 kFIRParameterItemID: product.sku,
-                                                 kFIRParameterItemName: product.name,
-                                                 kFIRParameterItemCategory: product.category,
-                                                 kFIRParameterValue: product.price,
-                                                 kFIRParameterPrice: product.price,
-                                                 kFIRParameterCurrency: commerceEvent.currency
-                                                 }];
+                                    parameters:parameters];
             }
         }
             break;
             
         case MPCommerceEventActionAddToWishList: {
             for (MPProduct *product in commerceEvent.products) {
+                parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:product withValue:nil];
+
                 [FIRAnalytics logEventWithName:kFIREventAddToWishlist
-                                    parameters:@{
-                                                 kFIRParameterQuantity: product.quantity,
-                                                 kFIRParameterItemID: product.sku,
-                                                 kFIRParameterItemName: product.name,
-                                                 kFIRParameterItemCategory: product.category,
-                                                 kFIRParameterValue: product.price,
-                                                 kFIRParameterPrice: product.price,
-                                                 kFIRParameterCurrency: commerceEvent.currency
-                                                 }];
+                                    parameters:parameters];
             }
         }
             break;
@@ -129,55 +127,47 @@
             for (MPProduct *product in commerceEvent.products) {
                 value = @([value doubleValue] + [product.price doubleValue]);
             }
+            parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:nil withValue:value];
 
             [FIRAnalytics logEventWithName:kFIREventBeginCheckout
-                                parameters:@{
-                                             kFIRParameterValue: value,
-                                             kFIRParameterCurrency: commerceEvent.currency,
-                                             kFIRParameterItemID: commerceEvent.transactionAttributes.transactionId
-                                             }];
+                                parameters:parameters];
         }
             break;
             
         case MPCommerceEventActionCheckoutOptions: {
+            parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:nil withValue:nil];
+
             [FIRAnalytics logEventWithName:kFIREventSetCheckoutOption
-                                parameters:@{
-                                             kFIRParameterCheckoutStep: @(commerceEvent.checkoutStep),
-                                             kFIRParameterCheckoutOption: commerceEvent.checkoutOptions
-                                             }];
+                                parameters:parameters];
         }
             break;
             
         case MPCommerceEventActionClick: {
             for (MPProduct *product in commerceEvent.products) {
-                [FIRAnalytics logEventWithName:kFIREventSelectContent
-                                    parameters:@{
-                                                 kFIRParameterContentType: @"product",
-                                                 kFIRParameterItemID: product.sku
-                                                 }];
+                if (product.sku) {
+                    [FIRAnalytics logEventWithName:kFIREventSelectContent
+                                        parameters:@{
+                                                     kFIRParameterContentType: @"product",
+                                                     kFIRParameterItemID: product.sku
+                                                     }];
+                }
             }
         }
             break;
             
         case MPCommerceEventActionViewDetail: {
             if (commerceEvent.products.count > 1) {
+                parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:commerceEvent.products[0] withValue:nil];
+
                 [FIRAnalytics logEventWithName:kFIREventViewItemList
-                                    parameters:@{
-                                                 kFIRParameterItemCategory: commerceEvent.products[0].category
-                                                 }];
+                                    parameters:parameters];
             }
             
             for (MPProduct *product in commerceEvent.products) {
+                parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:product withValue:nil];
+
                 [FIRAnalytics logEventWithName:kFIREventViewItem
-                                    parameters:@{
-                                                 kFIRParameterItemID: product.sku,
-                                                 kFIRParameterItemName: product.name,
-                                                 kFIRParameterItemCategory: product.category,
-                                                 kFIRParameterPrice: product.price,
-                                                 kFIRParameterQuantity: product.quantity,
-                                                 kFIRParameterCurrency: commerceEvent.currency,
-                                                 kFIRParameterValue: product.price
-                                                 }];
+                                    parameters:parameters];
             }
         }
             break;
@@ -188,15 +178,10 @@
                 value = @([value doubleValue] + [product.price doubleValue]);
             }
             
+            parameters = [self getParameterForCommerceEvent:commerceEvent andProduct:nil withValue:value];
+
             [FIRAnalytics logEventWithName:kFIREventEcommercePurchase
-                                parameters:@{
-                                             kFIRParameterCurrency: commerceEvent.currency,
-                                             kFIRParameterValue: value,
-                                             kFIRParameterTransactionID: commerceEvent.transactionAttributes.transactionId,
-                                             kFIRParameterTax: commerceEvent.transactionAttributes.tax,
-                                             kFIRParameterShipping: commerceEvent.transactionAttributes.shipping,
-                                             kFIRParameterCoupon: commerceEvent.transactionAttributes.couponCode
-                                             }];
+                                parameters:parameters];
         }
             break;
             
@@ -219,11 +204,17 @@
             break;
     }
     
-    return execStatus;
+    return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)logScreen:(MPEvent *)event {
-    if (![FIRApp defaultApp] || !event || event.name) return [self execStatus:MPKitReturnCodeFail];
+    if (![FIRApp defaultApp] && self.firebaseOptions != nil) {
+        [FIRApp configureWithOptions:self.firebaseOptions];
+    } else {
+        return [self execStatus:MPKitReturnCodeFail];
+    }
+    
+    if (![FIRApp defaultApp] || !event || !event.name) return [self execStatus:MPKitReturnCodeFail];
 
     [FIRAnalytics setScreenName:event.name screenClass:nil];
     
@@ -231,7 +222,15 @@
 }
 
 - (MPKitExecStatus *)logEvent:(MPEvent *)event {
-    if (![FIRApp defaultApp] || !event) return [self execStatus:MPKitReturnCodeFail];
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
+    if (![FIRApp defaultApp] || !event || !event.name) return [self execStatus:MPKitReturnCodeFail];
     
     [FIRAnalytics logEventWithName:event.name
                         parameters:event.info];
@@ -240,80 +239,124 @@
 }
 
 - (MPKitExecStatus *)onLoginComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
     [FIRAnalytics setUserID:user.userId.stringValue];
-    [self logUserIdentities:request.userIdentities];
+    [self logUserAttributes:user.userAttributes];
 
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)onIdentifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
     [FIRAnalytics setUserID:user.userId.stringValue];
-    [self logUserIdentities:request.userIdentities];
+    [self logUserAttributes:user.userAttributes];
 
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)onModifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
     [FIRAnalytics setUserID:user.userId.stringValue];
-    [self logUserIdentities:request.userIdentities];
+    [self logUserAttributes:user.userAttributes];
 
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)onLogoutComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return [self execStatus:MPKitReturnCodeFail];
+        }
+    }
+    
     [FIRAnalytics setUserID:nil];
     
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
-- (void)logUserIdentities:(NSDictionary<NSNumber *, NSString *> *)userIdentities {
-    NSArray *userIdentityKeys = userIdentities.allKeys;
-    for (NSNumber *identityKey in userIdentityKeys) {
-        NSString *propertyName;
-        
-        switch (identityKey.integerValue) {
-            case MPUserIdentityOther:
-                propertyName = @"other";
-                break;
-            case MPUserIdentityCustomerId:
-                propertyName = @"customerid";
-                break;
-            case MPUserIdentityFacebook:
-                propertyName = @"facebook";
-                break;
-            case MPUserIdentityTwitter:
-                propertyName = @"twitter";
-                break;
-            case MPUserIdentityGoogle:
-                propertyName = @"google";
-                break;
-            case MPUserIdentityMicrosoft:
-                propertyName = @"microsoft";
-                break;
-            case MPUserIdentityYahoo:
-                propertyName = @"yahoo";
-                break;
-            case MPUserIdentityAlias:
-                propertyName = @"alias";
-                break;
-            case MPUserIdentityFacebookCustomAudienceId:
-                propertyName = @"facebookcustom";
-                break;
-            case MPUserIdentityOther2:
-                propertyName = @"other2";
-                break;
-            case MPUserIdentityOther3:
-                propertyName = @"other3";
-                break;
-            case MPUserIdentityOther4:
-                propertyName = @"other4";
-                break;
-                
-            default:
-                break;
+- (void)logUserAttributes:(NSDictionary<NSString *, id> *)userAttributes {
+    if ([FIRApp defaultApp] == nil) {
+        if (self.firebaseOptions != nil) {
+            [FIRApp configureWithOptions:self.firebaseOptions];
+        } else {
+            return;
         }
-        [FIRAnalytics setUserPropertyString:userIdentities[identityKey] forName:propertyName];
     }
+    
+    NSArray *userAttributesKeys = userAttributes.allKeys;
+    for (NSString *attributeKey in userAttributesKeys) {
+        [FIRAnalytics setUserPropertyString:userAttributes[attributeKey] forName:attributeKey];
+    }
+}
+
+-(NSDictionary<NSString *, id> *)getParameterForCommerceEvent:(MPCommerceEvent *)commerceEvent andProduct:(MPProduct *)product withValue:(NSNumber *)value {
+    NSMutableDictionary<NSString *, id> *parameters = [[NSMutableDictionary alloc] init];
+    
+    if (product.quantity) {
+        [parameters setObject:product.quantity forKey:kFIRParameterQuantity];
+    }
+    if (product.sku) {
+        [parameters setObject:product.sku forKey:kFIRParameterItemID];
+    }
+    if (product.name) {
+        [parameters setObject:product.name forKey:kFIRParameterItemName];
+    }
+    if (product.category) {
+        [parameters setObject:product.category forKey:kFIRParameterItemCategory];
+    }
+    if (product.price) {
+        [parameters setObject:product.price forKey:kFIRParameterValue];
+        [parameters setObject:product.price forKey:kFIRParameterPrice];
+    }
+    if (commerceEvent.currency) {
+        [parameters setObject:commerceEvent.currency forKey:kFIRParameterCurrency];
+    }
+    if (value) {
+        [parameters setObject:value forKey:kFIRParameterValue];
+    }
+    if (commerceEvent.checkoutStep) {
+        [parameters setObject:@(commerceEvent.checkoutStep) forKey:kFIRParameterCheckoutStep];
+    }
+    if (commerceEvent.checkoutOptions) {
+        [parameters setObject:commerceEvent.checkoutOptions forKey:kFIRParameterCheckoutOption];
+    }
+    if (commerceEvent.transactionAttributes.transactionId) {
+        [parameters setObject:commerceEvent.transactionAttributes.transactionId forKey:kFIRParameterTransactionID];
+    }
+    if (commerceEvent.transactionAttributes.tax) {
+        [parameters setObject:commerceEvent.transactionAttributes.tax forKey:kFIRParameterTax];
+    }
+    if (commerceEvent.transactionAttributes.shipping) {
+        [parameters setObject:commerceEvent.transactionAttributes.shipping forKey:kFIRParameterShipping];
+    }
+    if (commerceEvent.transactionAttributes.couponCode) {
+        [parameters setObject:commerceEvent.transactionAttributes.couponCode forKey:kFIRParameterCoupon];
+    }
+
+    return parameters;
 }
 
 @end
