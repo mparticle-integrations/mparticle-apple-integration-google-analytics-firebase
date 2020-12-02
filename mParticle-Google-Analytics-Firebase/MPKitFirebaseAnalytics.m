@@ -384,11 +384,15 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     if (product.sku) {
         [parameters setObject:product.sku forKey:kFIRParameterItemID];
     }
-    if (product.name && product.category) {
-        NSArray *itemsArray = @[
-            @{kFIRParameterItemName : product.name, kFIRParameterItemCategory : product.category},
-        ];
-        [parameters setObject:itemsArray forKey:kFIRParameterItems];
+    NSMutableDictionary *itemDict = [[NSMutableDictionary alloc] init];
+    if (product.name) {
+        itemDict[kFIRParameterItemName] = product.name;
+    }
+    if (product.category) {
+        itemDict[kFIRParameterItemCategory] = product.category;
+    }
+    if (itemDict.count > 0) {
+        [parameters setObject:@[itemDict] forKey:kFIRParameterItems];
     }
     if (product.price) {
         [parameters setObject:@(product.price.doubleValue * product.quantity.doubleValue) forKey:kFIRParameterValue];
