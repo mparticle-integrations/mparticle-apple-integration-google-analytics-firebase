@@ -17,7 +17,7 @@ static NSString *const kMPFIRUserIdValueDeviceStamp = @"deviceApplicationStamp";
 static NSString *const reservedPrefixOne = @"firebase_";
 static NSString *const reservedPrefixTwo = @"google_";
 static NSString *const reservedPrefixThree = @"ga_";
-static NSString *const firebaseAllowedCharacters = @" _abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+static NSString *const firebaseAllowedCharacters = @"_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 static NSString *const aToZCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const NSInteger FIR_MAX_CHARACTERS_EVENT_NAME_INDEX = 39;
@@ -245,9 +245,16 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (NSString *)standardizeNameOrKey:(NSString *)nameOrKey forEvent:(BOOL)forEvent {
-    NSCharacterSet *notAllowedChars = [[NSCharacterSet characterSetWithCharactersInString:firebaseAllowedCharacters] invertedSet];
+    NSCharacterSet *whitespacesSet = [NSCharacterSet whitespaceCharacterSet];
+    NSMutableCharacterSet *firebaseAllowedCharacterSet = [NSMutableCharacterSet characterSetWithCharactersInString:firebaseAllowedCharacters];
+    [firebaseAllowedCharacterSet formUnionWithCharacterSet:whitespacesSet];
+    NSCharacterSet *notAllowedChars = [firebaseAllowedCharacterSet invertedSet];
     NSString* allowedNameOrKey = [[nameOrKey componentsSeparatedByCharactersInSet:notAllowedChars] componentsJoinedByString:@""];
-    NSString *standardizedString = [allowedNameOrKey stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"  +" options:NSRegularExpressionCaseInsensitive error:nil];
+    NSString *trimmedString = [regex stringByReplacingMatchesInString:allowedNameOrKey options:0 range:NSMakeRange(0, [allowedNameOrKey length]) withTemplate:@" "];
+
+    NSString *standardizedString = [trimmedString stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     if (standardizedString.length > reservedPrefixOne.length && [standardizedString hasPrefix:reservedPrefixOne]) {
         standardizedString = [standardizedString substringFromIndex:reservedPrefixOne.length];
     } else if (standardizedString.length > reservedPrefixTwo.length && [standardizedString hasPrefix:reservedPrefixTwo]) {
