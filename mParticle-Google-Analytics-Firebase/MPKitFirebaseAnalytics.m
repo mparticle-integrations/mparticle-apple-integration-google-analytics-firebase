@@ -1,6 +1,5 @@
 #import "MPKitFirebaseAnalytics.h"
 #import "Firebase.h"
-#import "MPEnums.h"
 
 @interface MPKitFirebaseAnalytics()
 
