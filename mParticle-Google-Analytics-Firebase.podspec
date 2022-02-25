@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = "mParticle-Google-Analytics-Firebase"
-    s.version          = "8.0.9"
+    s.version          = "8.1.0"
     s.summary          = "Google Analytics for Firebase integration for mParticle"
 
     s.description      = <<-DESC
@@ -19,6 +19,6 @@ Pod::Spec.new do |s|
     s.ios.dependency 'mParticle-Apple-SDK/mParticle', '~> 8.0'
     s.ios.frameworks = 'CoreTelephony', 'SystemConfiguration'
     s.libraries = 'z'
-    s.ios.dependency 'Firebase/Core', '~> 7.1'
+    s.ios.dependency 'Firebase/Core', '~> 8.0'
 
 end
