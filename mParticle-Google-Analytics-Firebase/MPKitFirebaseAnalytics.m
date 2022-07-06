@@ -136,12 +136,6 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
         }
             break;
             
-        case MPCommerceEventActionCheckoutOptions: {
-            [FIRAnalytics logEventWithName:kFIREventSetCheckoutOption
-                                parameters:parameters];
-        }
-            break;
-            
         case MPCommerceEventActionClick: {
             NSMutableDictionary<NSString *, id> *mutableParameters = [parameters mutableCopy];
             mutableParameters[kFIRParameterContentType] = @"product";
@@ -377,12 +371,6 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     
     if (commerceEvent.transactionAttributes.revenue) {
         [parameters setObject:commerceEvent.transactionAttributes.revenue forKey:kFIRParameterValue];
-    }
-    if (commerceEvent.checkoutStep != NSNotFound) {
-        [parameters setObject:@(commerceEvent.checkoutStep) forKey:kFIRParameterCheckoutStep];
-    }
-    if (commerceEvent.checkoutOptions) {
-        [parameters setObject:commerceEvent.checkoutOptions forKey:kFIRParameterCheckoutOption];
     }
     if (commerceEvent.transactionAttributes.transactionId) {
         [parameters setObject:commerceEvent.transactionAttributes.transactionId forKey:kFIRParameterTransactionID];
