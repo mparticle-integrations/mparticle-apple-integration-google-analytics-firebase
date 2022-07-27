@@ -1,5 +1,5 @@
 #import "MPKitFirebaseAnalytics.h"
-#import "Firebase.h"
+#import <Firebase/Firebase.h>
 
 @interface MPKitFirebaseAnalytics()
 
