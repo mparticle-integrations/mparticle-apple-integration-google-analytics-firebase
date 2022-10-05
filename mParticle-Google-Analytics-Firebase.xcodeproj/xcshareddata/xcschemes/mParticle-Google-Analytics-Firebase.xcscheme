@@ -20,6 +20,20 @@
                ReferencedContainer = "container:mParticle-Google-Analytics-Firebase.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D3C7855121FF6CEB00FE47D2"
+               BuildableName = "mParticle-Google-Analytics-FirebaseTests.xctest"
+               BlueprintName = "mParticle-Google-Analytics-FirebaseTests"
+               ReferencedContainer = "container:mParticle-Google-Analytics-Firebase.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -27,15 +41,6 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D316BD31217F670500688E56"
-            BuildableName = "mParticle_Google_Analytics_Firebase.framework"
-            BlueprintName = "mParticle-Google-Analytics-Firebase"
-            ReferencedContainer = "container:mParticle-Google-Analytics-Firebase.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
@@ -59,15 +64,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D316BD31217F670500688E56"
-            BuildableName = "mParticle_Google_Analytics_Firebase.framework"
-            BlueprintName = "mParticle-Google-Analytics-Firebase"
-            ReferencedContainer = "container:mParticle-Google-Analytics-Firebase.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

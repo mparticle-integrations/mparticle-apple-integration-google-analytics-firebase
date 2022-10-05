@@ -1,23 +1,44 @@
 #import "MPKitFirebaseAnalytics.h"
+#if SWIFT_PACKAGE
+    @import Firebase;
+#else
+    #if __has_include(<FirebaseCore/FirebaseCore.h>)
+        #import <FirebaseCore/FirebaseCore.h>
+        #import <FirebaseAnalytics/FIRAnalytics.h>
+    #else
+        #import "FirebaseCore/FirebaseCore.h"
+        #import "FirebaseAnalytics/FIRAnalytics.h"
+    #endif
+#endif
 
-@interface MPKitFirebaseAnalytics()
-
-@property (nonatomic, strong, readwrite) FIROptions *firebaseOptions;
+@interface MPKitFirebaseAnalytics () <MPKitProtocol> {
+    BOOL forwardRequestsServerSide;
+}
 
 @end
 
 @implementation MPKitFirebaseAnalytics
 
 static NSString *const kMPFIRUserIdValueCustomerID = @"customerId";
-static NSString *const kMPFIRUserIdValueEmail = @"email";
 static NSString *const kMPFIRUserIdValueMPID = @"mpid";
-static NSString *const kMPFIRUserIdValueDeviceStamp = @"deviceApplicationStamp";
+static NSString *const kMPFIRUserIdValueOther = @"Other";
+static NSString *const kMPFIRUserIdValueOther2 = @"Other2";
+static NSString *const kMPFIRUserIdValueOther3 = @"Other3";
+static NSString *const kMPFIRUserIdValueOther4 = @"Other4";
+static NSString *const kMPFIRUserIdValueOther5 = @"Other5";
+static NSString *const kMPFIRUserIdValueOther6 = @"Other6";
+static NSString *const kMPFIRUserIdValueOther7 = @"Other7";
+static NSString *const kMPFIRUserIdValueOther8 = @"Other8";
+static NSString *const kMPFIRUserIdValueOther9 = @"Other9";
+static NSString *const kMPFIRUserIdValueOther10 = @"Other10";
+static NSString *const kMPFIRUserIdValueDeviceStamp = @"DeviceApplicationStamp";
 
 static NSString *const reservedPrefixOne = @"firebase_";
 static NSString *const reservedPrefixTwo = @"google_";
 static NSString *const reservedPrefixThree = @"ga_";
 static NSString *const firebaseAllowedCharacters = @"_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 static NSString *const aToZCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static NSString *const instanceIdIntegrationKey = @"app_instance_id";
 
 const NSInteger FIR_MAX_CHARACTERS_EVENT_NAME_INDEX = 39;
 const NSInteger FIR_MAX_CHARACTERS_IDENTITY_NAME_INDEX = 23;
@@ -45,40 +66,14 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     _configuration = configuration;
     
     if ([FIRApp defaultApp] == nil) {
-        static dispatch_once_t FirebasePredicate;
-        
-        dispatch_once(&FirebasePredicate, ^{
-            NSString *googleAppId = configuration[kMPFIRGoogleAppIDKey];
-            NSString *gcmSenderId = configuration[kMPFIRSenderIDKey];
-            NSString *firAPIKey = configuration[kMPFIRAPIKey];
-            NSString *firProjectId = configuration[kMPFIRProjectIDKey];
-            
-            if (googleAppId && ![googleAppId isEqualToString:@""] && gcmSenderId && ![gcmSenderId isEqualToString:@""]) {
-                FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:googleAppId GCMSenderID:gcmSenderId];
-                if (firAPIKey) {
-                    options.APIKey = firAPIKey;
-                }
-                if (firProjectId) {
-                    options.projectID = firProjectId;
-                }
-                
-                self.firebaseOptions = options;
-                [FIRApp configureWithOptions:options];
-                
-                self->_started = YES;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    NSDictionary *userInfo = @{mParticleKitInstanceKey:[[self class] kitCode]};
-                    
-                    [[NSNotificationCenter defaultCenter] postNotificationName:mParticleKitDidBecomeActiveNotification
-                                                                        object:nil
-                                                                      userInfo:userInfo];
-                });
-            } else {
-                NSLog(@"Invalid Firebase App ID: %@ or invalid Google Project Number: %@", googleAppId, gcmSenderId);
-            }
-        });
+        NSAssert(NO, @"There is no instance of Firebase. Check the docs and review your code.");
+        return [self execStatus:MPKitReturnCodeFail];
     } else {
+        if ([self.configuration[kMPFIRForwardRequestsServerSide] isEqualToString: @"True"]) {
+            forwardRequestsServerSide = true;
+            [self updateInstanceIDIntegration];
+        }
+        
         _started = YES;
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -98,6 +93,10 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (nonnull MPKitExecStatus *)logBaseEvent:(nonnull MPBaseEvent *)event {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     if ([event isKindOfClass:[MPEvent class]]) {
         return [self routeEvent:(MPEvent *)event];
     } else if ([event isKindOfClass:[MPCommerceEvent class]]) {
@@ -108,69 +107,44 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)routeCommerceEvent:(MPCommerceEvent *)commerceEvent {
-    NSDictionary<NSString *, id> *parameters = [self getParameterForCommerceEvent:commerceEvent];
-    
-    switch (commerceEvent.action) {
-        case MPCommerceEventActionAddToCart: {
-            [FIRAnalytics logEventWithName:kFIREventAddToCart
-                                parameters:parameters];
+    NSDictionary<NSString *, id> *parameters;
+    NSString *eventName;
+    if (commerceEvent.promotionContainer) {
+        if (commerceEvent.promotionContainer.action == MPPromotionActionClick) {
+            eventName = kFIREventSelectPromotion;
+        } else if (commerceEvent.promotionContainer.action == MPPromotionActionView) {
+            eventName = kFIREventViewPromotion;
         }
-            break;
+        for (MPPromotion *promotion in commerceEvent.promotionContainer.promotions) {
+            parameters = [self getParameterForPromotionCommerceEvent:promotion];
             
-        case MPCommerceEventActionRemoveFromCart: {
-            [FIRAnalytics logEventWithName:kFIREventRemoveFromCart
-                                parameters:parameters];
+            [FIRAnalytics logEventWithName:eventName parameters:parameters];
         }
-            break;
+    } else if (commerceEvent.impressions) {
+        eventName = kFIREventViewItemList;
+        for (NSString *impressionKey in commerceEvent.impressions) {
+            parameters = [self getParameterForImpressionCommerceEvent:impressionKey products:commerceEvent.impressions[impressionKey]];
             
-        case MPCommerceEventActionAddToWishList: {
-            [FIRAnalytics logEventWithName:kFIREventAddToWishlist
-                                parameters:parameters];
+            [FIRAnalytics logEventWithName:eventName parameters:parameters];
         }
-            break;
-            
-        case MPCommerceEventActionCheckout: {
-            [FIRAnalytics logEventWithName:kFIREventBeginCheckout
-                                parameters:parameters];
-        }
-            break;
-            
-        case MPCommerceEventActionClick: {
-            NSMutableDictionary<NSString *, id> *mutableParameters = [parameters mutableCopy];
-            mutableParameters[kFIRParameterContentType] = @"product";
-            
-            [FIRAnalytics logEventWithName:kFIREventSelectContent
-                                parameters:mutableParameters];
-        }
-            break;
-            
-        case MPCommerceEventActionViewDetail: {
-            [FIRAnalytics logEventWithName:kFIREventViewItem
-                                parameters:parameters];
-        }
-            break;
-            
-        case MPCommerceEventActionPurchase: {
-            [FIRAnalytics logEventWithName:kFIREventPurchase
-                                parameters:parameters];
-        }
-            break;
-            
-        case MPCommerceEventActionRefund: {
-            [FIRAnalytics logEventWithName:kFIREventRefund
-                                parameters:parameters];
-        }
-            break;
-            
-        default:
+    } else {
+        parameters = [self getParameterForCommerceEvent:commerceEvent];
+        eventName = [self getEventNameForCommerceEvent:commerceEvent parameters:parameters];
+        if (!eventName) {
             return [self execStatus:MPKitReturnCodeFail];
-            break;
+        }
+        
+        [FIRAnalytics logEventWithName:eventName parameters:parameters];
     }
     
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)logScreen:(MPEvent *)event {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     if (!event || !event.name) {
         return [self execStatus:MPKitReturnCodeFail];
     }
@@ -188,8 +162,7 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     
     NSString *standardizedFirebaseEventName = [self standardizeNameOrKey:event.name forEvent:YES];
     event.customAttributes = [self standardizeValues:event.customAttributes forEvent:YES];
-    [FIRAnalytics logEventWithName:standardizedFirebaseEventName
-                        parameters:event.customAttributes];
+    [FIRAnalytics logEventWithName:standardizedFirebaseEventName parameters:event.customAttributes];
     
     return [self execStatus:MPKitReturnCodeSuccess];
 }
@@ -261,6 +234,10 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)onLoginComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     NSString *userId = [self userIdForFirebase:user];
     if (userId) {
         [FIRAnalytics setUserID:userId];
@@ -272,6 +249,10 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)onIdentifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     NSString *userId = [self userIdForFirebase:user];
     if (userId) {
         [FIRAnalytics setUserID:userId];
@@ -283,6 +264,10 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)onModifyComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     NSString *userId = [self userIdForFirebase:user];
     if (userId) {
         [FIRAnalytics setUserID:userId];
@@ -294,6 +279,10 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)onLogoutComplete:(FilteredMParticleUser *)user request:(FilteredMPIdentityApiRequest *)request {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     NSString *userId = [self userIdForFirebase:user];
     if (userId) {
         [FIRAnalytics setUserID:userId];
@@ -304,16 +293,28 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)removeUserAttribute:(NSString *)key {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     [FIRAnalytics setUserPropertyString:nil forName:[self standardizeNameOrKey:key forEvent:NO]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)setUserAttribute:(NSString *)key value:(id)value {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     [FIRAnalytics setUserPropertyString:[NSString stringWithFormat:@"%@", [self standardizeValue:value forEvent:NO]] forName:[self standardizeNameOrKey:key forEvent:NO]];
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
 - (MPKitExecStatus *)setUserIdentity:(NSString *)identityString identityType:(MPUserIdentity)identityType {
+    if (forwardRequestsServerSide) {
+        return [self execStatus:MPKitReturnCodeUnavailable];
+    }
+    
     NSString *userId = [self userIdForFirebase:[self.kitApi getCurrentUserWithKit:self]];
     if (userId) {
         [FIRAnalytics setUserID:userId];
@@ -331,7 +332,97 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     }
 }
 
--(NSDictionary<NSString *, id> *)getParameterForCommerceEvent:(MPCommerceEvent *)commerceEvent {
+- (NSString *)getEventNameForCommerceEvent:(MPCommerceEvent *)commerceEvent parameters:(NSDictionary<NSString *, id> *)parameters {
+    switch (commerceEvent.action) {
+        case MPCommerceEventActionAddToCart:
+            return kFIREventAddToCart;
+        case MPCommerceEventActionRemoveFromCart:
+            return kFIREventRemoveFromCart;
+        case MPCommerceEventActionAddToWishList:
+            return kFIREventAddToWishlist;
+        case MPCommerceEventActionCheckout:
+            return kFIREventBeginCheckout;
+        case MPCommerceEventActionCheckoutOptions: {
+            NSArray *firebaseCommerceEventType = commerceEvent.customFlags[kMPFIRCommerceEventType];
+            if (firebaseCommerceEventType) {
+                if ([firebaseCommerceEventType containsObject:kFIREventAddShippingInfo]) {
+                    return kFIREventAddShippingInfo;
+                } else if ([firebaseCommerceEventType containsObject:kFIREventAddPaymentInfo]) {
+                    return kFIREventAddPaymentInfo;
+                }
+            }
+        }
+        case MPCommerceEventActionClick:
+            return kFIREventSelectItem;
+        case MPCommerceEventActionViewDetail:
+            return kFIREventViewItem;
+        case MPCommerceEventActionPurchase:
+            return kFIREventPurchase;
+        case MPCommerceEventActionRefund:
+            return kFIREventRefund;
+        default:
+            return nil;
+    }
+}
+
+- (NSDictionary<NSString *, id> *)getParameterForPromotionCommerceEvent:(MPPromotion *)promotion {
+    NSMutableDictionary<NSString *, id> *parameters = [[NSMutableDictionary alloc] init];
+    
+    if (promotion.promotionId) {
+        [parameters setObject:promotion.promotionId forKey:kFIRParameterPromotionID];
+    }
+    if (promotion.creative) {
+        [parameters setObject:promotion.creative forKey:kFIRParameterCreativeName];
+    }
+    if (promotion.name) {
+        [parameters setObject:promotion.name forKey:kFIRParameterPromotionName];
+    }
+    if (promotion.position) {
+        [parameters setObject:promotion.position forKey:kFIRParameterCreativeSlot];
+    }
+    
+    return parameters;
+}
+
+- (NSDictionary<NSString *, id> *)getParameterForImpressionCommerceEvent:(NSString *)impressionKey products:(NSSet<MPProduct *> *)products {
+    NSMutableDictionary<NSString *, id> *parameters = [[NSMutableDictionary alloc] init];
+    
+    [parameters setObject:impressionKey forKey:kFIRParameterItemListID];
+    [parameters setObject:impressionKey forKey:kFIRParameterItemListName];
+    
+    if (products.count > 0) {
+        NSMutableArray *itemArray = [[NSMutableArray alloc] init];
+        for (MPProduct *product in products) {
+            NSMutableDictionary<NSString *, id> *productParameters = [[NSMutableDictionary alloc] init];
+            
+            if (product.quantity) {
+                [productParameters setObject:product.quantity forKey:kFIRParameterQuantity];
+            }
+            if (product.sku) {
+                [productParameters setObject:product.sku forKey:kFIRParameterItemID];
+            }
+            if (product.name) {
+                [productParameters setObject:product.name forKey:kFIRParameterItemName];
+            }
+            if (product.category) {
+                [productParameters setObject:product.category forKey:kFIRParameterItemCategory];
+            }
+            if (product.price) {
+                [productParameters setObject:product.price forKey:kFIRParameterPrice];
+            }
+            
+            [itemArray addObject:productParameters];
+        }
+        
+        if (itemArray.count > 0) {
+            [parameters setObject:itemArray forKey:kFIRParameterItems];
+        }
+    }
+    
+    return parameters;
+}
+
+- (NSDictionary<NSString *, id> *)getParameterForCommerceEvent:(MPCommerceEvent *)commerceEvent {
     NSMutableDictionary<NSString *, id> *parameters = [[NSMutableDictionary alloc] init];
     
     NSMutableArray *itemArray = [[NSMutableArray alloc] init];
@@ -384,24 +475,80 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
         [parameters setObject:commerceEvent.transactionAttributes.couponCode forKey:kFIRParameterCoupon];
     }
     
+    if (commerceEvent.action == MPCommerceEventActionClick) {
+        [parameters setObject:@"product" forKey:kFIRParameterContentType];
+    }
+    
+    NSArray *firebaseCommerceEventType = commerceEvent.customFlags[kMPFIRCommerceEventType];
+    if (firebaseCommerceEventType) {
+        if ([firebaseCommerceEventType containsObject:kFIREventAddShippingInfo]) {
+            NSArray *shippingTier = commerceEvent.customFlags[kMPFIRShippingTier];
+            if (shippingTier.count > 0) {
+                [parameters setObject:shippingTier[0] forKey:kFIRParameterShippingTier];
+            }
+        }
+        if ([firebaseCommerceEventType containsObject:kFIREventAddPaymentInfo]) {
+            NSArray *paymentInfo = commerceEvent.customFlags[kMPFIRPaymentType];
+            if (paymentInfo.count > 0) {
+                [parameters setObject:paymentInfo[0] forKey:kFIRParameterPaymentType];
+            }
+        }
+    }
+    
     return parameters;
 }
 
 - (NSString * _Nullable)userIdForFirebase:(FilteredMParticleUser *)currentUser {
     NSString *userId;
-    if (currentUser != nil && self.configuration[kMPFIRUserIdFieldKey] != nil) {
-        NSString *key = self.configuration[kMPFIRUserIdFieldKey];
-        if ([key isEqualToString:kMPFIRUserIdValueCustomerID] && currentUser.userIdentities[@(MPUserIdentityCustomerId)] != nil) {
+    if (currentUser != nil && self.configuration[kMPFIRExternalUserIdentityType] != nil) {
+        NSString *externalUserIdentityType = self.configuration[kMPFIRExternalUserIdentityType];
+        
+        if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueCustomerID] && currentUser.userIdentities[@(MPUserIdentityCustomerId)] != nil) {
             userId = currentUser.userIdentities[@(MPUserIdentityCustomerId)];
-        } else if ([key isEqualToString:kMPFIRUserIdValueEmail] && currentUser.userIdentities[@(MPUserIdentityEmail)] != nil) {
-            userId = currentUser.userIdentities[@(MPUserIdentityEmail)];
-        } else if ([key isEqualToString:kMPFIRUserIdValueMPID] && currentUser.userId != nil) {
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueMPID] && currentUser.userId != nil) {
             userId = currentUser.userId != 0 ? [currentUser.userId stringValue] : nil;
-        } else if ([key isEqualToString:kMPFIRUserIdValueDeviceStamp]) {
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther] && currentUser.userIdentities[@(MPUserIdentityOther)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther2] && currentUser.userIdentities[@(MPUserIdentityOther2)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther2)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther3] && currentUser.userIdentities[@(MPUserIdentityOther3)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther3)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther4] && currentUser.userIdentities[@(MPUserIdentityOther4)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther4)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther5] && currentUser.userIdentities[@(MPUserIdentityOther5)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther5)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther6] && currentUser.userIdentities[@(MPUserIdentityOther6)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther6)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther7] && currentUser.userIdentities[@(MPUserIdentityOther7)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther7)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther8] && currentUser.userIdentities[@(MPUserIdentityOther8)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther8)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther9] && currentUser.userIdentities[@(MPUserIdentityOther9)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther9)];
+        } else if ([externalUserIdentityType isEqualToString: kMPFIRUserIdValueOther10] && currentUser.userIdentities[@(MPUserIdentityOther10)] != nil) {
+            userId = currentUser.userIdentities[@(MPUserIdentityOther10)];
+        } else if ([externalUserIdentityType isEqualToString:kMPFIRUserIdValueDeviceStamp]) {
             userId = [[[MParticle sharedInstance] identity] deviceApplicationStamp];
         }
     }
+    
+    if (userId) {
+        if ([self.configuration[kMPFIRShouldHashUserId] isEqualToString: @"True"]) {
+            userId = [MPIHasher hashString:[userId lowercaseString]];
+        }
+    } else {
+        NSLog(@"External identity type of %@ not set on the user", self.configuration[kMPFIRExternalUserIdentityType]);
+    }
     return userId;
+}
+
+- (void)updateInstanceIDIntegration  {
+    NSString *appInstanceID = [FIRAnalytics appInstanceID];
+    
+    if (appInstanceID.length) {
+        NSDictionary<NSString *, NSString *> *integrationAttributes = @{instanceIdIntegrationKey:appInstanceID};
+        [[MParticle sharedInstance] setIntegrationAttributes:integrationAttributes forKit:[[self class] kitCode]];
+    }
 }
 
 @end

@@ -4,17 +4,6 @@
 #else
 #import "mParticle.h"
 #endif
-#if SWIFT_PACKAGE
-    @import Firebase;
-#else
-    #if __has_include(<FirebaseCore/FirebaseCore.h>)
-        #import <FirebaseCore/FirebaseCore.h>
-        #import <FirebaseAnalytics/FIRAnalytics.h>
-    #else
-        #import "FirebaseCore/FirebaseCore.h"
-        #import "FirebaseAnalytics/FIRAnalytics.h"
-    #endif
-#endif
 
 @interface MPKitFirebaseAnalytics : NSObject <MPKitProtocol>
 
@@ -29,4 +18,9 @@ static NSString * _Nonnull const kMPFIRGoogleAppIDKey = @"firebaseAppId";
 static NSString * _Nonnull const kMPFIRSenderIDKey = @"googleProjectNumber";
 static NSString * _Nonnull const kMPFIRAPIKey = @"firebaseAPIKey";
 static NSString * _Nonnull const kMPFIRProjectIDKey = @"firebaseProjectId";
-static NSString * _Nonnull const kMPFIRUserIdFieldKey = @"userIdField";
+static NSString * _Nonnull const kMPFIRExternalUserIdentityType = @"userIdField";
+static NSString * _Nonnull const kMPFIRShouldHashUserId = @"hashUserId";
+static NSString * _Nonnull const kMPFIRForwardRequestsServerSide = @"forwardWebRequestsServerSide";
+static NSString * _Nonnull const kMPFIRCommerceEventType = @"Firebase.CommerceEventType";
+static NSString * _Nonnull const kMPFIRPaymentType = @"Firebase.PaymentType";
+static NSString * _Nonnull const kMPFIRShippingTier = @"Firebase.ShippingTier";
