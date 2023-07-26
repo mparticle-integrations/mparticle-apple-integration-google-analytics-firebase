@@ -30,9 +30,6 @@ module.exports = {
         "@semantic-release/github",
         {
           assets: [
-            "mParticle_Google_Analytics_Firebase.framework.zip",
-            "mParticle_Google_Analytics_Firebase.xcframework.zip",
-            "generated-docs.zip",
           ],
         },
       ],
