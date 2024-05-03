@@ -1,6 +1,7 @@
-#import <XCTest/XCTest.h>
 #import "MPKitFirebaseAnalytics.h"
-#import "Firebase.h"
+@import XCTest;
+@import FirebaseCore;
+@import FirebaseAnalytics;
 
 @interface FIRApp()
 + (void)resetApps;
@@ -126,7 +127,7 @@
     MPCommerceEvent *event = [[MPCommerceEvent alloc] initWithAction:MPCommerceEventActionCheckoutOptions];
     NSDictionary<NSString *, id> *parameters = [exampleKit getParameterForCommerceEvent:event];
     NSString *eventName = [exampleKit getEventNameForCommerceEvent:event parameters:parameters];
-    XCTAssertEqualObjects(kFIREventSetCheckoutOption, eventName);
+    XCTAssertEqualObjects(kFIREventSelectItem, eventName);
 
     // Test kFIREventAddShippingInfo
     event = [[MPCommerceEvent alloc] initWithAction:MPCommerceEventActionCheckoutOptions];

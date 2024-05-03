@@ -16,7 +16,8 @@ Pod::Spec.new do |s|
 
     s.ios.deployment_target = "10.0"
     s.ios.source_files      = 'mParticle-Google-Analytics-Firebase/*.{h,m,mm}'
-    s.ios.dependency 'mParticle-Apple-SDK/mParticle', '~> 8.0'
+    s.ios.resource_bundles  = { 'mParticle-Google-Analytics-Firebase-Privacy' => ['mParticle-Google-Analytics-Firebase/PrivacyInfo.xcprivacy'] }
+    s.ios.dependency 'mParticle-Apple-SDK/mParticle', '~> 8.22'
     s.ios.frameworks = 'CoreTelephony', 'SystemConfiguration'
     s.libraries = 'z'
     s.ios.dependency 'Firebase/Core', '~> 10.23'
