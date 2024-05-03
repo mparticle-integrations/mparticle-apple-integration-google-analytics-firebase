@@ -14,10 +14,10 @@ let package = Package(
     dependencies: [
       .package(name: "mParticle-Apple-SDK",
                url: "https://github.com/mParticle/mparticle-apple-sdk",
-               .upToNextMajor(from: "8.0.0")),
+               .upToNextMajor(from: "8.22.0")),
       .package(name: "Firebase",
                url: "https://github.com/firebase/firebase-ios-sdk.git",
-               .upToNextMajor(from: "10.6.0")),
+               .upToNextMajor(from: "10.23.0")),
     ],
     targets: [
         .target(
@@ -28,6 +28,7 @@ let package = Package(
             ],
             path: "mParticle-Google-Analytics-Firebase",
             exclude: ["Info.plist", "dummy.swift"],
+            resources: [.process("PrivacyInfo.xcprivacy")],
             publicHeadersPath: "."),
     ]
 )
