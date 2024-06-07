@@ -1,3 +1,10 @@
+# [8.5.0](https://github.com/mparticle-integrations/mparticle-apple-integration-google-analytics-firebase/compare/v8.4.0...v8.5.0) (2024-06-07)
+
+
+### Features
+
+* Add Consent Support ([#30](https://github.com/mparticle-integrations/mparticle-apple-integration-google-analytics-firebase/issues/30)) ([4d6c808](https://github.com/mparticle-integrations/mparticle-apple-integration-google-analytics-firebase/commit/4d6c808e7d3d804ae50d9f58ab5d6c75bac0fe8e))
+
 # [8.4.0](https://github.com/mparticle-integrations/mparticle-apple-integration-google-analytics-firebase/compare/v8.3.0...v8.4.0) (2024-05-03)
 
 
