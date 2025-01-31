@@ -163,7 +163,7 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
     }
 
     NSMutableDictionary *screenParameters = [self getParametersForScreen:event];
-    [FIRAnalytics logEventWithName:kFIREventScreenView parameters: screenParameters];
+    [FIRAnalytics logEventWithName:kFIREventScreenView parameters:screenParameters];
     
     return [self execStatus:MPKitReturnCodeSuccess];
 }
