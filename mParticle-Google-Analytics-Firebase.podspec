@@ -21,5 +21,13 @@ Pod::Spec.new do |s|
     s.ios.frameworks = 'CoreTelephony', 'SystemConfiguration'
     s.libraries = 'z'
     s.ios.dependency 'Firebase/Core', '~> 12.0'
+    
+    s.tvos.deployment_target = "15.0"
+    s.tvos.source_files      = 'mParticle-Google-Analytics-Firebase/*.{h,m,mm}'
+    s.tvos.resource_bundles  = { 'mParticle-Google-Analytics-Firebase-Privacy' => ['mParticle-Google-Analytics-Firebase/PrivacyInfo.xcprivacy'] }
+    s.tvos.dependency 'mParticle-Apple-SDK/mParticle', '~> 8.22'
+    s.tvos.frameworks = 'CoreTelephony', 'SystemConfiguration'
+    s.libraries = 'z'
+    s.tvos.dependency 'Firebase/Core', '~> 12.0'
 
 end
