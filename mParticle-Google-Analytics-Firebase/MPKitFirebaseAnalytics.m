@@ -672,7 +672,7 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (NSArray<NSDictionary *>*)mappingForKey:(NSString*)key {
-    NSString *mappingJson = _configuration[@"consentMappingSDK"];
+    NSString *mappingJson = _configuration[key];
     if (![mappingJson isKindOfClass:[NSString class]]) {
         return nil;
     }
