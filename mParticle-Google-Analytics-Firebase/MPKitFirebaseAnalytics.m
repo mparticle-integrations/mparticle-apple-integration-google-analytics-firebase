@@ -663,12 +663,7 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 
     // Fallback to configuration defaults
     NSString *value = self->_configuration[defaultKey];
-    if ([value isEqualToString:@"Granted"]) {
-        return @(YES);
-    } else if ([value isEqualToString:@"Denied"]) {
-        return @(NO);
-    }
-    return nil;
+    return [value isGranted];
 }
 
 - (NSArray<NSDictionary *>*)mappingForKey:(NSString*)key {
