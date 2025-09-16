@@ -13,6 +13,19 @@
     #endif
 #endif
 
+@implementation NSString(PRIVATE)
+
+- (NSNumber*)isGranted {
+    if ([self isEqualToString:@"Granted"]) {
+        return @(YES);
+    } else if ([self isEqualToString:@"Denied"]) {
+        return @(NO);
+    }
+    return nil;
+}
+
+@end
+
 @interface MPKitFirebaseAnalytics () <MPKitProtocol> {
     BOOL forwardRequestsServerSide;
 }
