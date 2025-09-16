@@ -8,7 +8,7 @@
 import XCTest
 @testable import mParticle_Google_Analytics_Firebase
 
-final class MPKitFirebaseAnalyticsHelperTests: XCTestCase {
+final class MPKitFirebaseSwiftTests: XCTestCase {
 
     var kit: MPKitFirebaseAnalytics!
 
