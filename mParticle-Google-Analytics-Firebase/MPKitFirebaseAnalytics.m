@@ -13,6 +13,19 @@
     #endif
 #endif
 
+@implementation NSString(PRIVATE)
+
+- (NSNumber*)isGranted {
+    if ([self isEqualToString:@"Granted"]) {
+        return @(YES);
+    } else if ([self isEqualToString:@"Denied"]) {
+        return @(NO);
+    }
+    return nil;
+}
+
+@end
+
 @interface MPKitFirebaseAnalytics () <MPKitProtocol> {
     BOOL forwardRequestsServerSide;
 }
@@ -77,6 +90,11 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 
 #pragma mark MPKitInstanceProtocol methods
 - (MPKitExecStatus *)didFinishLaunchingWithConfiguration:(NSDictionary *)configuration {
+    MParticleUser *currentUser = [[[MParticle sharedInstance] identity] currentUser];
+    return [self didFinishLaunchingWithConfiguration:configuration withConsentState:currentUser.consentState];
+}
+
+- (MPKitExecStatus *)didFinishLaunchingWithConfiguration:(NSDictionary *)configuration withConsentState: (MPConsentState *)consentState {
     _configuration = configuration;
     
     if ([FIRApp defaultApp] == nil) {
@@ -88,7 +106,7 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
             [self updateInstanceIDIntegration];
         }
         
-        [self updateConsent];
+        [self updateConsent: consentState];
         
         _started = YES;
         
@@ -356,21 +374,19 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 }
 
 - (MPKitExecStatus *)setConsentState:(nullable MPConsentState *)state {
-    [self updateConsent];
+    [self updateConsent: state];
 
     return [self execStatus:MPKitReturnCodeSuccess];
 }
 
-- (void)updateConsent {
+- (void)updateConsent:(MPConsentState *)consentState {
     NSArray<NSDictionary *> *mappings = [self mappingForKey: @"consentMappingSDK"];
     NSDictionary<NSString *, NSString *> *mappingsConfig;
     if (mappings != nil) {
         mappingsConfig = [self convertToKeyValuePairs: mappings];
     }
     
-    
-    MParticleUser *currentUser = [[[MParticle sharedInstance] identity] currentUser];
-    NSDictionary<NSString *, MPGDPRConsent *> *gdprConsents = currentUser.consentState.gdprConsentState;
+    NSDictionary<NSString *, MPGDPRConsent *> *gdprConsents = consentState.gdprConsentState;
 
     NSNumber *adStorage = [self resolvedConsentForMappingKey:kMPFIRGAAdStorageKey
                                                   defaultKey:kMPFIRGA4DefaultAdStorageKey
@@ -650,16 +666,11 @@ const NSInteger FIR_MAX_CHARACTERS_IDENTITY_ATTR_VALUE_INDEX = 35;
 
     // Fallback to configuration defaults
     NSString *value = self->_configuration[defaultKey];
-    if ([value isEqualToString:@"Granted"]) {
-        return @(YES);
-    } else if ([value isEqualToString:@"Denied"]) {
-        return @(NO);
-    }
-    return nil;
+    return [value isGranted];
 }
 
 - (NSArray<NSDictionary *>*)mappingForKey:(NSString*)key {
-    NSString *mappingJson = _configuration[@"consentMappingSDK"];
+    NSString *mappingJson = _configuration[key];
     if (![mappingJson isKindOfClass:[NSString class]]) {
         return nil;
     }

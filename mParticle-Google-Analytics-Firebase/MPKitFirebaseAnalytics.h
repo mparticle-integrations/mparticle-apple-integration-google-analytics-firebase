@@ -17,6 +17,15 @@
 @property (nonatomic, unsafe_unretained, readonly) BOOL started;
 @property (nonatomic, strong, nullable) MPKitAPI *kitApi;
 
+- (nullable NSNumber *)resolvedConsentForMappingKey:(NSString * _Nonnull)mappingKey
+                                         defaultKey:(NSString * _Nonnull)defaultKey
+                                       gdprConsents:(NSDictionary<NSString *, MPGDPRConsent *> * _Nonnull)gdprConsents
+                                            mapping:(NSDictionary<NSString *, NSString *> * _Nullable)mapping;
+
+- (nullable NSArray<NSDictionary *>*)mappingForKey:(NSString* _Nonnull)key;
+
+- (nonnull NSDictionary*)convertToKeyValuePairs: (NSArray<NSDictionary *> * _Nonnull)mappings;
+
 @end
 
 static NSString * _Nonnull const kMPFIRGoogleAppIDKey = @"firebaseAppId";
