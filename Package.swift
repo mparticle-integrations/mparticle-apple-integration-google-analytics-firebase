@@ -13,7 +13,7 @@ let package = Package(
     ],
     dependencies: [
       .package(url: "https://github.com/mParticle/mparticle-apple-sdk",
-               .upToNextMajor(from: "8.22.0")),
+               .upToNextMajor(from: "9.0.0")),
       .package(url: "https://github.com/firebase/firebase-ios-sdk.git",
                .upToNextMajor(from: "12.0.0")),
     ],
